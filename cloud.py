@@ -26,19 +26,24 @@ def main(mode: str, groups: int, n: int):
         stop_flags = ["u", "p", "r", "m", "q", "y", "w", "d", "c"]
         sw = list(map(lambda e: strip_text(e), sw_file.readlines()))
         for line in file.readlines():
+            words = set()
             for word in line.split(" "):
                 word = word.strip()
                 if word and not word.isspace():
                     word_split = list(map(lambda entry: entry.strip(), word.split("/")))
                     word = word_split[0]
-                    if word_split[1] in stop_flags or word in sw:
-                        continue
-                    if word in result:
-                        result[word] = result[word] + 1
-                    else:
-                        result[word] = 0
-        with open("freq.csv", "w", encoding="UTF-8") as output:
+                    if word_split[1] not in stop_flags and word not in sw:
+                        words.add(word)
+            for w in words:  # 又是群友的需求... 呜呜呜，wuwuwuwuuuuuuu
+                if w in result:
+                    result[w] += 1
+                else:
+                    result[w] = 0
+
+        with open("freq.csv", "w", encoding="UTF-8") as output, \
+                open("freq_stylecloud.csv", "w", encoding="UTF-8") as output_stylecloud:
             lines = []
+            lines_stylecloud = []
             result = sorted(result.items(), key=lambda item: item[1], reverse=True)[:n]
             result_max = result[0][1]
             for index, (key, freq) in enumerate(result):
@@ -53,8 +58,10 @@ def main(mode: str, groups: int, n: int):
 
                 if key:
                     lines.append(f"{weight},\"{key}\"")
+                    lines_stylecloud.append(f"\"{key}\",{weight}.0")
             output.write("\n".join(lines))
-    print("result has been saved to freq.csv.")
+            output_stylecloud.write("\n".join(lines_stylecloud))
+    print("result has been saved to freq.csv and freq_stylecloud.csv.")
 
 
 if __name__ == '__main__':

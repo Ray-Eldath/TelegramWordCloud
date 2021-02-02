@@ -37,11 +37,13 @@ def main(ignore: list):
                                 text_entry = strip_text(str(text_entry))
                                 if text_entry:
                                     inner_result.append(text_entry)
-                        result.append(''.join(inner_result))
+                        text = ''.join(inner_result)
                     elif type(text) == str:
                         text = strip_text(text)
-                        if text:
-                            result.append(text)
+                    if "forwarded_from" in entry and len(text) > 100:  # 我们yan真是太聪明了！！
+                        continue
+                    elif text:
+                        result.append(text)
             output.write('\n'.join(result))
     print("result has been saved to file data")
 
